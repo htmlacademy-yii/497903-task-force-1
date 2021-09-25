@@ -8,19 +8,25 @@ use Yii;
  * This is the model class for table "tasks".
  *
  * @property int $id
- * @property string $title
- * @property string $description
+ * @property int $executor_id
+ * @property int $customer_id
+ * @property string $dt_add
  * @property int $category_id
- * @property string|null $latitude
- * @property string|null $longitude
- * @property int|null $price
- * @property string|null $task_term_at
- * @property int $client_id
- * @property int|null $executor_id
- * @property int $status
- * @property string $created_at
- * @property string|null $updated_at
- * @property int $city_id
+ * @property string|null $description
+ * @property string|null $status
+ * @property string $expire
+ * @property string $name
+ * @property string|null $address
+ * @property int $budget
+ * @property string|null $lat
+ * @property string|null $long
+ * @property int|null $opinions
+ *
+ * @property Categories $category
+ * @property Users $customer
+ * @property Users $executor
+ * @property Opinions[] $opinions0
+ * @property Replies[] $replies
  */
 class Tasks extends \yii\db\ActiveRecord
 {
@@ -38,15 +44,15 @@ class Tasks extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['title', 'description', 'category_id', 'client_id', 'city_id'], 'required'],
-            [['description'], 'string'],
-            [['category_id', 'price', 'client_id', 'executor_id', 'status', 'city_id'], 'integer'],
-            [['task_term_at', 'created_at', 'updated_at'], 'safe'],
-            [['title', 'latitude', 'longitude'], 'string', 'max' => 255],
-            [['title'], 'unique'],
-            [['category_id'], 'unique'],
-            [['client_id'], 'unique'],
-            [['status'], 'unique'],
+            [['executor_id', 'customer_id', 'category_id', 'name', 'budget'], 'required'],
+            [['executor_id', 'customer_id', 'category_id', 'budget', 'opinions'], 'integer'],
+            [['dt_add', 'expire'], 'safe'],
+            [['description', 'address'], 'string', 'max' => 255],
+            [['status', 'lat', 'long'], 'string', 'max' => 15],
+            [['name'], 'string', 'max' => 45],
+            [['executor_id'], 'exist', 'skipOnError' => true, 'targetClass' => Users::className(), 'targetAttribute' => ['executor_id' => 'id']],
+            [['customer_id'], 'exist', 'skipOnError' => true, 'targetClass' => Users::className(), 'targetAttribute' => ['customer_id' => 'id']],
+            [['category_id'], 'exist', 'skipOnError' => true, 'targetClass' => Categories::className(), 'targetAttribute' => ['category_id' => 'id']],
         ];
     }
 
@@ -57,20 +63,70 @@ class Tasks extends \yii\db\ActiveRecord
     {
         return [
             'id' => 'ID',
-            'title' => 'Title',
-            'description' => 'Description',
-            'category_id' => 'Category ID',
-            'latitude' => 'Latitude',
-            'longitude' => 'Longitude',
-            'price' => 'Price',
-            'task_term_at' => 'Task Term At',
-            'client_id' => 'Client ID',
             'executor_id' => 'Executor ID',
+            'customer_id' => 'Customer ID',
+            'dt_add' => 'Dt Add',
+            'category_id' => 'Category ID',
+            'description' => 'Description',
             'status' => 'Status',
-            'created_at' => 'Created At',
-            'updated_at' => 'Updated At',
-            'city_id' => 'City ID',
+            'expire' => 'Expire',
+            'name' => 'Name',
+            'address' => 'Address',
+            'budget' => 'Budget',
+            'lat' => 'Lat',
+            'long' => 'Long',
+            'opinions' => 'Opinions',
         ];
+    }
+
+    /**
+     * Gets query for [[Category]].
+     *
+     * @return \yii\db\ActiveQuery|CategoriesQuery
+     */
+    public function getCategory()
+    {
+        return $this->hasOne(Categories::className(), ['id' => 'category_id']);
+    }
+
+    /**
+     * Gets query for [[Customer]].
+     *
+     * @return \yii\db\ActiveQuery|UsersQuery
+     */
+    public function getCustomer()
+    {
+        return $this->hasOne(Users::className(), ['id' => 'customer_id']);
+    }
+
+    /**
+     * Gets query for [[Executor]].
+     *
+     * @return \yii\db\ActiveQuery|UsersQuery
+     */
+    public function getExecutor()
+    {
+        return $this->hasOne(Users::className(), ['id' => 'executor_id']);
+    }
+
+    /**
+     * Gets query for [[Opinions0]].
+     *
+     * @return \yii\db\ActiveQuery|OpinionsQuery
+     */
+    public function getOpinions0()
+    {
+        return $this->hasMany(Opinions::className(), ['task_id' => 'id']);
+    }
+
+    /**
+     * Gets query for [[Replies]].
+     *
+     * @return \yii\db\ActiveQuery|RepliesQuery
+     */
+    public function getReplies()
+    {
+        return $this->hasMany(Replies::className(), ['task_id' => 'id']);
     }
 
     /**

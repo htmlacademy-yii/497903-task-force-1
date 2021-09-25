@@ -3,11 +3,11 @@
 namespace frontend\models;
 
 /**
- * This is the ActiveQuery class for [[ResetPasswordForm]].
+ * This is the ActiveQuery class for [[UsersCategories]].
  *
- * @see ResetPasswordForm
+ * @see UsersCategories
  */
-class ResetPasswordFormQuery extends \yii\db\ActiveQuery
+class UsersCategoriesQuery extends \yii\db\ActiveQuery
 {
     /*public function active()
     {
@@ -16,7 +16,7 @@ class ResetPasswordFormQuery extends \yii\db\ActiveQuery
 
     /**
      * {@inheritdoc}
-     * @return ResetPasswordForm[]|array
+     * @return UsersCategories[]|array
      */
     public function all($db = null)
     {
@@ -25,7 +25,7 @@ class ResetPasswordFormQuery extends \yii\db\ActiveQuery
 
     /**
      * {@inheritdoc}
-     * @return ResetPasswordForm|array|null
+     * @return UsersCategories|array|null
      */
     public function one($db = null)
     {

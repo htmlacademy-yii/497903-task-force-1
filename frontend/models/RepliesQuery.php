@@ -3,11 +3,11 @@
 namespace frontend\models;
 
 /**
- * This is the ActiveQuery class for [[UserPhotos]].
+ * This is the ActiveQuery class for [[Replies]].
  *
- * @see UserPhotos
+ * @see Replies
  */
-class UserPhotosQuery extends \yii\db\ActiveQuery
+class RepliesQuery extends \yii\db\ActiveQuery
 {
     /*public function active()
     {
@@ -16,7 +16,7 @@ class UserPhotosQuery extends \yii\db\ActiveQuery
 
     /**
      * {@inheritdoc}
-     * @return UserPhotos[]|array
+     * @return Replies[]|array
      */
     public function all($db = null)
     {
@@ -25,7 +25,7 @@ class UserPhotosQuery extends \yii\db\ActiveQuery
 
     /**
      * {@inheritdoc}
-     * @return UserPhotos|array|null
+     * @return Replies|array|null
      */
     public function one($db = null)
     {
