@@ -3,23 +3,23 @@
 use yii\db\Migration;
 
 /**
- * Class m211009_161744_create_reviews
+ * Class m211030_113807_create_replies
  */
-class m211009_161744_create_reviews extends Migration
+class m211030_113807_create_replies extends Migration
 {
     public function up()
     {
-        $this->createTable('reviews', [
+        $this->createTable('replies', [
             'id' => $this->primaryKey(),
             'executor_id' => $this->integer()->notNull(),
-            'customer_id' => $this->integer()->notNull(),
             'description' => $this->text()->defaultValue(null),
-            'rate' => $this->integer()->notNull(),
+            'task_id' => $this->integer()->notNull(),
+            'dt_add' => $this->integer()->notNull(),
         ]);
 
         $this->addForeignKey(
-            'fk_executor_id_users_id',
-            'reviews',
+            'fk_replies_executor_id_users_id',
+            'replies',
             'executor_id',
             'users',
             'id',
@@ -27,10 +27,10 @@ class m211009_161744_create_reviews extends Migration
         );
 
         $this->addForeignKey(
-            'fk_customer_id_users_id',
-            'reviews',
-            'customer_id',
-            'users',
+            'fk_replies_task_id_tasks_id',
+            'replies',
+            'task_id',
+            'tasks',
             'id',
             'CASCADE'
         );
@@ -39,8 +39,8 @@ class m211009_161744_create_reviews extends Migration
     public function down()
     {
         $this->dropForeignKey(
-            'customer_id',
-            'users'
+            'task_id',
+            'tasks'
         );
 
         $this->dropForeignKey(
@@ -48,6 +48,6 @@ class m211009_161744_create_reviews extends Migration
             'users'
         );
 
-        $this->dropTable('reviews');
+        $this->dropTable('replies');
     }
 }
