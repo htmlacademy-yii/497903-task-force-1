@@ -5,25 +5,25 @@ namespace frontend\models;
 use Yii;
 
 /**
- * This is the model class for table "reviews".
+ * This is the model class for table "replies".
  *
  * @property int $id
  * @property int $executor_id
- * @property int $customer_id
  * @property string|null $description
- * @property int $rate
+ * @property int $task_id
+ * @property string $dt_add
  *
- * @property Users $customer
  * @property Users $executor
+ * @property Tasks $task
  */
-class Reviews extends \yii\db\ActiveRecord
+class Replies extends \yii\db\ActiveRecord
 {
     /**
      * {@inheritdoc}
      */
     public static function tableName()
     {
-        return 'reviews';
+        return 'replies';
     }
 
     /**
@@ -32,11 +32,12 @@ class Reviews extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['executor_id', 'customer_id', 'rate'], 'required'],
-            [['executor_id', 'customer_id', 'rate'], 'integer'],
+            [['executor_id', 'task_id'], 'required'],
+            [['executor_id', 'task_id'], 'integer'],
+            [['dt_add'], 'safe'],
             [['description'], 'string', 'max' => 255],
             [['executor_id'], 'exist', 'skipOnError' => true, 'targetClass' => Users::className(), 'targetAttribute' => ['executor_id' => 'id']],
-            [['customer_id'], 'exist', 'skipOnError' => true, 'targetClass' => Users::className(), 'targetAttribute' => ['customer_id' => 'id']],
+            [['task_id'], 'exist', 'skipOnError' => true, 'targetClass' => Tasks::className(), 'targetAttribute' => ['task_id' => 'id']],
         ];
     }
 
@@ -48,20 +49,10 @@ class Reviews extends \yii\db\ActiveRecord
         return [
             'id' => 'ID',
             'executor_id' => 'Executor ID',
-            'customer_id' => 'Customer ID',
             'description' => 'Description',
-            'rate' => 'Rate',
+            'task_id' => 'Task ID',
+            'dt_add' => 'Dt Add',
         ];
-    }
-
-    /**
-     * Gets query for [[Customer]].
-     *
-     * @return \yii\db\ActiveQuery|UsersQuery
-     */
-    public function getCustomer()
-    {
-        return $this->hasOne(Users::className(), ['id' => 'customer_id']);
     }
 
     /**
@@ -75,11 +66,21 @@ class Reviews extends \yii\db\ActiveRecord
     }
 
     /**
+     * Gets query for [[Task]].
+     *
+     * @return \yii\db\ActiveQuery|TasksQuery
+     */
+    public function getTask()
+    {
+        return $this->hasOne(Tasks::className(), ['id' => 'task_id']);
+    }
+
+    /**
      * {@inheritdoc}
-     * @return ReviewsQuery the active query used by this AR class.
+     * @return RepliesQuery the active query used by this AR class.
      */
     public static function find()
     {
-        return new ReviewsQuery(get_called_class());
+        return new RepliesQuery(get_called_class());
     }
 }

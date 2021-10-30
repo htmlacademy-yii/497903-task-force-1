@@ -2,17 +2,17 @@
 
 namespace frontend\controllers;
 
-use frontend\models\Users;
+use frontend\models\UserFilter;
 use yii\web\Controller;
+use Yii;
 
 class UsersController extends Controller
 {
-  public function actionIndex()
-  {
-    $users = Users::find()
-      ->orderBy('id DESC')
-      ->all();
+    public function actionIndex()
+    {
+        $filter = new UserFilter();
+        $filter->load(Yii::$app->request->get());
 
-    return $this->render('index', ['users' => $users]);
-  }
+        return $this->render('index', ['filter' => $filter]);
+    }
 }

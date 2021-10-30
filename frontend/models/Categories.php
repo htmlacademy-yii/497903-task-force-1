@@ -3,12 +3,17 @@
 namespace frontend\models;
 
 use Yii;
+use yii\helpers\ArrayHelper;
 
 /**
  * This is the model class for table "categories".
  *
  * @property int $id
- * @property string $category
+ * @property string|null $name
+ * @property string $icon
+ *
+ * @property Tasks[] $tasks
+ * @property UsersCategories[] $usersCategories
  */
 class Categories extends \yii\db\ActiveRecord
 {
@@ -26,9 +31,8 @@ class Categories extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['category'], 'required'],
-            [['category'], 'string', 'max' => 45],
-            [['category'], 'unique'],
+            [['icon'], 'required'],
+            [['name', 'icon'], 'string', 'max' => 45],
         ];
     }
 
@@ -39,8 +43,29 @@ class Categories extends \yii\db\ActiveRecord
     {
         return [
             'id' => 'ID',
-            'category' => 'Category',
+            'name' => 'Name',
+            'icon' => 'Icon',
         ];
+    }
+
+    /**
+     * Gets query for [[Tasks]].
+     *
+     * @return \yii\db\ActiveQuery|TasksQuery
+     */
+    public function getTasks()
+    {
+        return $this->hasMany(Tasks::className(), ['category_id' => 'id']);
+    }
+
+    /**
+     * Gets query for [[UsersCategories]].
+     *
+     * @return \yii\db\ActiveQuery|UsersCategoriesQuery
+     */
+    public function getUsersCategories()
+    {
+        return $this->hasMany(UsersCategories::className(), ['category_id' => 'id']);
     }
 
     /**
@@ -50,5 +75,10 @@ class Categories extends \yii\db\ActiveRecord
     public static function find()
     {
         return new CategoriesQuery(get_called_class());
+    }
+
+    public static function getCategorisList()
+    {
+        return ArrayHelper::map(self::find()->all(), 'id', 'name');;
     }
 }

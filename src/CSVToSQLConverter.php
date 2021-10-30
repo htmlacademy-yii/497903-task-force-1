@@ -6,6 +6,8 @@ use Exceptions\TaskForceException;
 
 class CSVToSQLConverter
 {
+    public $CSVFileObject;
+
     public function createSQLFromCSV($file, $directory): void
     {
         if (!file_exists($file)) {
@@ -14,21 +16,30 @@ class CSVToSQLConverter
 
         if (!file_exists($directory)  && !mkdir($directory)) {
             throw new TaskForceException('Не удалось создать дуректорию');
+            mkdir($directory);
         }
 
         try {
-            $CSVFileObject = new \SplFileObject($file, 'r');
+            $this->CSVFileObject = new \SplFileObject($file, 'r');
         } catch (TaskForceException $exception) {
             throw new TaskForceException('Не удалось открыть файл на чтение');
         }
 
-        $CSVFileObject->setFlags(\SplFileObject::DROP_NEW_LINE | \SplFileObject::READ_AHEAD | \SplFileObject::SKIP_EMPTY | \SplFileObject::READ_CSV);
+        $this->CSVFileObject->setFlags(\SplFileObject::DROP_NEW_LINE | \SplFileObject::READ_AHEAD | \SplFileObject::SKIP_EMPTY | \SplFileObject::READ_CSV);
 
         $headerData = implode(', ', $this->getHeaderData());
 
-        $values[] = sprintf("\t(%s)", implode(', ', array_map(function ($item) {
-            return "'{$item}'";
-        }, $CSVFileObject->fgetcsv(','))));
+        foreach ($this->getNextLine() as $line) {
+            $values[] =
+                sprintf(
+                    "\t(%s)",
+                    implode(', ', array_map(function ($item) {
+                        return "'{$item}'";
+                    }, $this->CSVFileObject->fgetcsv(',')))
+                );
+        }
+
+        print($values);
 
         $newFile = basename($file, '.csv');
 
@@ -38,14 +49,30 @@ class CSVToSQLConverter
             throw new TaskForceException('Не удалось создать или записать в файл');
         }
 
-        $SQLFileObject->fwrite("INSERT INTO $newFile ($headerData) VALUES $values;");
+        $SQLFileObject->fwrite("INSERT INTO $newFile ($headerData) VALUES " . implode(', ', $values) . ";");
     }
 
     public function getHeaderData(): ?array
     {
-        $this->CSVFileObject->rewind();
         $data = $this->CSVFileObject->fgetcsv();
 
         return $data;
+    }
+
+    public function getNextLine(): ?iterable
+    {
+        $result = null;
+
+        while (!$this->CSVFileObject->eof()) {
+            $line = $this->CSVFileObject->fgetcsv();
+
+            if (empty($line)) {
+                continue;
+            }
+
+            yield $line;
+        }
+
+        return $result;
     }
 }
